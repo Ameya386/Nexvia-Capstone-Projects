@@ -1,5 +1,7 @@
 # AIML-03 - Large-Scale Personalized Recommendation Engine
 
+**GitHub:** https://github.com/Ameya386/recommendation-engine
+
 A two-stage recommender in the style of Netflix/Amazon:
 **Stage 1** finds a few hundred candidates fast (two-tower model + FAISS), **Stage 2** re-scores them precisely
 (deep ranker: Wide&Deep or DCN). Results are cached in Redis, models are servable via Triton, features are built with
