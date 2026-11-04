@@ -1,0 +1,12 @@
+# Optional infra:  docker compose up -d
+# Redis = cache.  Triton = model serving (loads ./model_repository created by train_ranker.py)
+services:
+  redis:
+    image: redis:7
+    ports: ["6379:6379"]
+  triton:
+    image: nvcr.io/nvidia/tritonserver:24.05-py3
+    command: tritonserver --model-repository=/models --strict-model-config=false
+    ports: ["8000:8000", "8001:8001", "8002:8002"]
+    volumes: ["./model_repository:/models"]
+    # then:  export TRITON_URL=localhost:8000   (the app falls back to local scoring if Triton is down)

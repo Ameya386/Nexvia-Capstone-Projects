@@ -1,0 +1,14 @@
+# Python 3.10 or 3.11 recommended (Google Colab works too)
+numpy
+pandas
+scikit-learn
+matplotlib
+tensorflow>=2.15
+tf-keras            # TFRS needs Keras 2 -> we set TF_USE_LEGACY_KERAS=1 in src/config.py
+tensorflow-recommenders>=0.7.3
+faiss-cpu
+redis               # optional: falls back to an in-memory cache if Redis is not running
+streamlit           # demo UI
+pyspark             # optional: Spark feature pipeline (needs Java 8/11/17)
+tritonclient[http]  # optional: only if you run the Triton server
+pytest
