@@ -1,0 +1,3 @@
+name: "ranker_wide_deep"
+platform: "tensorflow_savedmodel"
+max_batch_size: 4096

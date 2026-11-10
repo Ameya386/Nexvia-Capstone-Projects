@@ -1,0 +1,26 @@
+{
+  "NDCG@10":{
+    "Popularity baseline":0.0502,
+    "Two-tower retrieval only":0.0529,
+    "A: Retrieval + Wide&Deep":0.0599,
+    "B: Retrieval + DCN":0.0661
+  },
+  "Recall@10":{
+    "Popularity baseline":0.0501,
+    "Two-tower retrieval only":0.0696,
+    "A: Retrieval + Wide&Deep":0.0751,
+    "B: Retrieval + DCN":0.0805
+  },
+  "HitRate@10":{
+    "Popularity baseline":0.2083,
+    "Two-tower retrieval only":0.2406,
+    "A: Retrieval + Wide&Deep":0.2639,
+    "B: Retrieval + DCN":0.2675
+  },
+  "Recall@200":{
+    "Popularity baseline":0.3407,
+    "Two-tower retrieval only":0.4433,
+    "A: Retrieval + Wide&Deep":0.4433,
+    "B: Retrieval + DCN":0.4433
+  }
+}
