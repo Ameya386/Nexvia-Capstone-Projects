@@ -1,0 +1,21 @@
+# docker compose up --build
+#   Orthanc DICOM server: http://localhost:8042   Viewer (React): http://localhost:8000
+# Then send demo studies:  python scripts/upload_to_orthanc.py --dir samples/dicom --url http://localhost:8042
+services:
+  orthanc:
+    image: jodogne/orthanc
+    ports: ["8042:8042", "4242:4242"]
+    volumes:
+      - ./configs/orthanc.json:/etc/orthanc/orthanc.json:ro
+      - orthanc-db:/var/lib/orthanc/db
+  api:
+    build: .
+    ports: ["8000:8000"]
+    volumes: ["./runtime:/app/runtime"]
+  worker:
+    build: .
+    command: ["python", "-m", "service.worker", "--orthanc", "http://orthanc:8042", "--interval", "5"]
+    volumes: ["./runtime:/app/runtime"]
+    depends_on: [orthanc]
+volumes:
+  orthanc-db:

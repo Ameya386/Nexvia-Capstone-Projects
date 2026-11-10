@@ -1,0 +1,37 @@
+# Reproducible, versioned pipeline:   dvc repro
+# Datasets/arrays are cached by DVC (git-ignored); small models/figures use cache:false so Git tracks them directly
+# (their hashes are still recorded in dvc.lock).
+stages:
+  prepare_data:
+    cmd: python -m src.prepare_data
+    deps: [src/prepare_data.py]
+    params: [data]
+    outs: [data/processed]
+    metrics:
+      - results/dataset_summary.json: {cache: false}
+  train_classifier:
+    cmd: python -m src.train_classifier
+    deps: [src/train_classifier.py, src/model.py, src/preprocess.py, data/processed]
+    params: [classifier]
+    outs:
+      - models/densenet121_chestmnist.pt: {cache: false}
+      - models/classifier_meta.json: {cache: false}
+      - results/classifier_auroc.png: {cache: false}
+    metrics:
+      - results/classifier_metrics.json: {cache: false}
+  train_segmentation:
+    cmd: python -m src.train_segmentation
+    deps: [src/train_segmentation.py]
+    params: [segmentation]
+    outs:
+      - models/unet3d_hippocampus.pt: {cache: false}
+      - results/seg_examples: {cache: false}
+    metrics:
+      - results/seg_metrics.json: {cache: false}
+  make_examples:
+    cmd: python -m src.make_examples
+    deps: [src/make_examples.py, src/inference.py, src/gradcam.py, src/dicom_utils.py, models/densenet121_chestmnist.pt, data/processed]
+    params: [examples]
+    outs:
+      - samples/dicom: {cache: false}
+      - results/gradcam_examples.png: {cache: false}

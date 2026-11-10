@@ -1,0 +1,22 @@
+{
+  "version": "densenet121-chestmnist128-v1",
+  "labels": [
+    "atelectasis",
+    "cardiomegaly",
+    "effusion",
+    "infiltration",
+    "mass",
+    "nodule",
+    "pneumonia",
+    "pneumothorax",
+    "consolidation",
+    "edema",
+    "emphysema",
+    "fibrosis",
+    "pleural thickening",
+    "hernia"
+  ],
+  "image_size": 128,
+  "backbone": "densenet121 (ImageNet pre-trained)",
+  "cam_layer": "features.denseblock3"
+}

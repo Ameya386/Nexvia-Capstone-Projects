@@ -1,0 +1,64 @@
+{
+  "source": "NIH ChestX-ray14 via MedMNIST v3 (ChestMNIST, down-sampled)",
+  "image_size": 128,
+  "train": {
+    "n": 20000,
+    "no_finding_fraction": 0.54115,
+    "prevalence": {
+      "atelectasis": 0.1001,
+      "cardiomegaly": 0.0251,
+      "effusion": 0.1176,
+      "infiltration": 0.1769,
+      "mass": 0.0511,
+      "nodule": 0.0588,
+      "pneumonia": 0.0129,
+      "pneumothorax": 0.0473,
+      "consolidation": 0.0408,
+      "edema": 0.0216,
+      "emphysema": 0.0221,
+      "fibrosis": 0.0135,
+      "pleural thickening": 0.0295,
+      "hernia": 0.0018
+    }
+  },
+  "val": {
+    "n": 4000,
+    "no_finding_fraction": 0.5355,
+    "prevalence": {
+      "atelectasis": 0.1003,
+      "cardiomegaly": 0.0243,
+      "effusion": 0.1212,
+      "infiltration": 0.1785,
+      "mass": 0.058,
+      "nodule": 0.0575,
+      "pneumonia": 0.0105,
+      "pneumothorax": 0.045,
+      "consolidation": 0.0423,
+      "edema": 0.017,
+      "emphysema": 0.0163,
+      "fibrosis": 0.0177,
+      "pleural thickening": 0.0348,
+      "hernia": 0.0043
+    }
+  },
+  "test": {
+    "n": 10000,
+    "no_finding_fraction": 0.527,
+    "prevalence": {
+      "atelectasis": 0.1073,
+      "cardiomegaly": 0.0269,
+      "effusion": 0.1223,
+      "infiltration": 0.1753,
+      "mass": 0.0512,
+      "nodule": 0.0583,
+      "pneumonia": 0.0117,
+      "pneumothorax": 0.0498,
+      "consolidation": 0.0409,
+      "edema": 0.0196,
+      "emphysema": 0.0221,
+      "fibrosis": 0.0168,
+      "pleural thickening": 0.0348,
+      "hernia": 0.0013
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "version": "densenet121-chestmnist128-v1",
+  "n_train": 20000,
+  "n_val": 4000,
+  "n_test": 10000,
+  "epochs": 4,
+  "best_val_mean_auroc": 0.8008618146555199,
+  "test_mean_auroc": 0.7991460185554672,
+  "test_auroc_per_class": {
+    "atelectasis": 0.7875593597483409,
+    "cardiomegaly": 0.8984816088085484,
+    "effusion": 0.8695407913588169,
+    "infiltration": 0.6796144854762655,
+    "mass": 0.7774729222109507,
+    "nodule": 0.6968842706458941,
+    "pneumonia": 0.7215515549017522,
+    "pneumothorax": 0.8412585302269908,
+    "consolidation": 0.7833892766726345,
+    "edema": 0.8685521944395873,
+    "emphysema": 0.8505584272142863,
+    "fibrosis": 0.7510845901623464,
+    "pleural thickening": 0.7662816889835232,
+    "hernia": 0.8958145589266047
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.19460829920768738,
+      "val_mean_auroc": 0.7556964350632148
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.15535195920467376,
+      "val_mean_auroc": 0.7930578907620046
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.14604059064388275,
+      "val_mean_auroc": 0.7977654348795228
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.1373691158056259,
+      "val_mean_auroc": 0.8008618146555199
+    }
+  ]
+}

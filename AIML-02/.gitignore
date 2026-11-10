@@ -1,0 +1,9 @@
+data/medmnist/
+data/msd/
+runtime/*
+!runtime/.gitkeep
+__pycache__/
+*.pyc
+.venv/
+.ipynb_checkpoints/
+.git/

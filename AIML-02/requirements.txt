@@ -1,0 +1,16 @@
+# Training / experiments (Google Colab already has torch + torchvision)
+torch
+torchvision
+medmnist>=3.0
+monai
+nibabel
+pydicom
+pyyaml
+scikit-learn
+matplotlib
+pillow
+requests
+dvc
+# Serving
+fastapi
+uvicorn

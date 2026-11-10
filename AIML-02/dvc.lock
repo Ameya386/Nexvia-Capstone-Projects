@@ -1,0 +1,143 @@
+schema: '2.0'
+stages:
+  prepare_data:
+    cmd: python -m src.prepare_data
+    deps:
+    - path: src/prepare_data.py
+      hash: md5
+      md5: 47a99fec45514c1ed970101dd3e30831
+      size: 1761
+    params:
+      params.yaml:
+        data:
+          image_size: 128
+          max_train: 20000
+          max_val: 4000
+          max_test: 10000
+          seed: 42
+    outs:
+    - path: data/processed
+      hash: md5
+      md5: 972c729803571351f0f7df0b74781dc2.dir
+      size: 432398376
+      nfiles: 3
+    - path: results/dataset_summary.json
+      hash: md5
+      md5: fda77c376cca548d0021ab2efadf1cf7
+      size: 1528
+  train_classifier:
+    cmd: python -m src.train_classifier
+    deps:
+    - path: data/processed
+      hash: md5
+      md5: 972c729803571351f0f7df0b74781dc2.dir
+      size: 432398376
+      nfiles: 3
+    - path: src/model.py
+      hash: md5
+      md5: 210de0152f1750421f84ccb828d8cb97
+      size: 401
+    - path: src/preprocess.py
+      hash: md5
+      md5: 5adc187f8dd6f5c1ac0bbd5bfcefe021
+      size: 716
+    - path: src/train_classifier.py
+      hash: md5
+      md5: af98e161c7cb40f71cbd04870cbd9601
+      size: 5579
+    params:
+      params.yaml:
+        classifier:
+          epochs: 4
+          batch_size: 128
+          lr: 0.0003
+    outs:
+    - path: models/classifier_meta.json
+      hash: md5
+      md5: b0718830aa68f2d5ba484a1b3944a483
+      size: 422
+    - path: models/densenet121_chestmnist.pt
+      hash: md5
+      md5: edae3cc3cd00850acd712fb1a561bdfe
+      size: 28452548
+    - path: results/classifier_auroc.png
+      hash: md5
+      md5: 0d2f51579a463732bd44143377ed8502
+      size: 77576
+    - path: results/classifier_metrics.json
+      hash: md5
+      md5: 6eab306d4375c829355d882c3f8d1f20
+      size: 1239
+  train_segmentation:
+    cmd: python -m src.train_segmentation
+    deps:
+    - path: src/train_segmentation.py
+      hash: md5
+      md5: dc34d7a60c572cbcec516dc45abb5ae3
+      size: 6494
+    params:
+      params.yaml:
+        segmentation:
+          epochs: 60
+          batch_size: 4
+          lr: 0.001
+          spatial_size:
+          - 48
+          - 64
+          - 48
+    outs:
+    - path: models/unet3d_hippocampus.pt
+      hash: md5
+      md5: 154397ddfa2192a396a242135e9f91c5
+      size: 4767853
+    - path: results/seg_examples
+      hash: md5
+      md5: 02bfbe994d359f1ee01b07096028f53d.dir
+      size: 87889
+      nfiles: 3
+    - path: results/seg_metrics.json
+      hash: md5
+      md5: 6dfc90353ed5ff46a110ace1a327e5eb
+      size: 3733
+  make_examples:
+    cmd: python -m src.make_examples
+    deps:
+    - path: data/processed
+      hash: md5
+      md5: 972c729803571351f0f7df0b74781dc2.dir
+      size: 432398376
+      nfiles: 3
+    - path: models/densenet121_chestmnist.pt
+      hash: md5
+      md5: edae3cc3cd00850acd712fb1a561bdfe
+      size: 28452548
+    - path: src/dicom_utils.py
+      hash: md5
+      md5: b340266fe44d140d1d824a2d4beffb76
+      size: 2981
+    - path: src/gradcam.py
+      hash: md5
+      md5: af1b6d4f05359b9bb6957716332c3e64
+      size: 1816
+    - path: src/inference.py
+      hash: md5
+      md5: 27f39cd6605fdf239a053573dcf50ad7
+      size: 1284
+    - path: src/make_examples.py
+      hash: md5
+      md5: 75af7ed32688e78c3ce53b36eb0878af
+      size: 2138
+    params:
+      params.yaml:
+        examples:
+          n_dicom: 12
+    outs:
+    - path: results/gradcam_examples.png
+      hash: md5
+      md5: 90f5a17bd52a53a6f86b1c65ac148530
+      size: 1311094
+    - path: samples/dicom
+      hash: md5
+      md5: e4041cc28bed8ba307d31e34c346fea6.dir
+      size: 207696
+      nfiles: 12

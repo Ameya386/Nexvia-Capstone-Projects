@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI-Assisted Imaging Review (education only)</title>
+<style>
+  :root { --bg:#0f1720; --panel:#17212d; --line:#263445; --text:#e6edf3; --muted:#8fa1b3; --accent:#4c9aff; --ok:#2ea043; --bad:#da3633; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:var(--bg); color:var(--text); }
+  .banner { background:#7a1f1f; color:#fff; text-align:center; padding:8px; font-weight:700; letter-spacing:.04em; }
+  header { display:flex; gap:16px; align-items:center; padding:12px 20px; border-bottom:1px solid var(--line); }
+  header h1 { font-size:18px; margin:0; margin-right:auto; }
+  nav button { background:none; border:none; color:var(--muted); padding:8px 12px; cursor:pointer; font-size:14px; border-bottom:2px solid transparent; }
+  nav button.on { color:var(--text); border-color:var(--accent); }
+  main { padding:20px; max-width:1200px; margin:0 auto; }
+  .grid { display:grid; grid-template-columns: 280px 1fr; gap:20px; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px; }
+  .study { padding:10px; border-radius:8px; cursor:pointer; border:1px solid transparent; margin-bottom:6px; }
+  .study:hover { background:#1e2b3a; } .study.sel { border-color:var(--accent); background:#1e2b3a; }
+  .badge { font-size:11px; padding:2px 8px; border-radius:10px; float:right; }
+  .pending { background:#4a3b12; color:#f2cc60; } .approved { background:#12351c; color:#56d364; } .rejected { background:#3d1515; color:#ff7b72; }
+  .imgs { display:flex; gap:16px; flex-wrap:wrap; }
+  .imgs figure { margin:0; } .imgs img { width:340px; max-width:100%; border-radius:8px; background:#000; display:block; }
+  figcaption { color:var(--muted); font-size:12px; margin-top:4px; }
+  .bar { height:10px; background:#243447; border-radius:5px; overflow:hidden; } .bar i { display:block; height:100%; background:var(--accent); }
+  .row { display:grid; grid-template-columns:140px 1fr 48px; gap:8px; align-items:center; font-size:13px; margin:5px 0; }
+  input, textarea { width:100%; background:#0f1720; color:var(--text); border:1px solid var(--line); border-radius:6px; padding:8px; font:inherit; }
+  .btns { display:flex; gap:10px; margin-top:10px; }
+  .btn { border:none; border-radius:6px; padding:10px 18px; color:#fff; font-weight:600; cursor:pointer; } .btn.ok { background:var(--ok); } .btn.bad { background:var(--bad); }
+  table { width:100%; border-collapse:collapse; font-size:12px; } th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  .muted { color:var(--muted); } .big { font-size:22px; font-weight:700; } .msg { margin-top:8px; color:#f2cc60; font-size:13px; }
+  label.t { display:flex; gap:6px; align-items:center; font-size:13px; color:var(--muted); margin:8px 0; }
+</style>
+<script crossorigin src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
+<script crossorigin src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.24.7/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useCallback } = React;
+
+async function api(path, opts) {
+  const r = await fetch("/api" + path, opts);
+  if (!r.ok) { let t = ""; try { t = (await r.json()).detail; } catch (e) {} throw new Error(t || r.statusText); }
+  return r.json();
+}
+
+function Review() {
+  const [studies, setStudies] = useState([]);
+  const [sel, setSel] = useState(null);
+  const [detail, setDetail] = useState(null);
+  const [showCam, setShowCam] = useState(true);
+  const [reviewer, setReviewer] = useState("");
+  const [comment, setComment] = useState("");
+  const [msg, setMsg] = useState("");
+
+  const load = useCallback(() => api("/studies").then(setStudies).catch(e => setMsg(e.message)), []);
+  useEffect(() => { load(); const t = setInterval(load, 8000); return () => clearInterval(t); }, [load]);
+  useEffect(() => { if (sel) api("/studies/" + sel).then(setDetail).catch(e => setMsg(e.message)); }, [sel]);
+
+  const decide = async (decision) => {
+    setMsg("");
+    try {
+      const d = await api("/studies/" + sel + "/decision", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ decision, reviewer, comment }) });
+      setDetail(d); setComment(""); load();
+    } catch (e) { setMsg(e.message); }
+  };
+
+  const top = detail ? Object.entries(detail.probs).sort((a, b) => b[1] - a[1]).slice(0, 6) : [];
+  return (
+    <div className="grid">
+      <div className="panel">
+        <b>Worklist</b> <span className="muted">({studies.length})</span>
+        <div style={{ marginTop: 10 }}>
+          {studies.length === 0 && <div className="muted">No studies yet. Start the worker to ingest DICOM files.</div>}
+          {studies.map(s => (
+            <div key={s.id} className={"study" + (s.id === sel ? " sel" : "")} onClick={() => setSel(s.id)}>
+              <span className={"badge " + s.status}>{s.status}</span>
+              <div>{s.patient_id}</div>
+              <div className="muted" style={{ fontSize: 12 }}>{s.modality} - {s.top_label} {(s.confidence * 100).toFixed(0)}%</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="panel">
+        {!detail && <div className="muted">Select a study from the worklist.</div>}
+        {detail && (<div>
+          <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap" }}>
+            <div><div className="big">{detail.patient_id}</div><div className="muted">{detail.description}</div></div>
+            <div style={{ textAlign: "right" }}>
+              <div className="muted">AI top finding</div>
+              <div className="big">{detail.top_label} - {(detail.confidence * 100).toFixed(1)}%</div>
+              <span className={"badge " + detail.status} style={{ float: "none" }}>{detail.status}</span>
+            </div>
+          </div>
+          <label className="t"><input type="checkbox" style={{ width: "auto" }} checked={showCam} onChange={e => setShowCam(e.target.checked)} /> Show Grad-CAM overlay</label>
+          <div className="imgs">
+            <figure><img src={"/api/studies/" + detail.id + "/image"} alt="scan" /><figcaption>Scan</figcaption></figure>
+            {showCam && <figure><img src={"/api/studies/" + detail.id + "/overlay"} alt="Grad-CAM overlay" /><figcaption>Grad-CAM: regions that raised the score for "{detail.top_label}"</figcaption></figure>}
+          </div>
+          <p className="muted" style={{ fontSize: 12 }}>Dataset reference label: {(detail.reference_label || "n/a").replace(/^Dataset reference label:\s*/i, "")} (shown for demo only). Model {detail.model_version}.</p>
+          <b>Model probabilities (not calibrated, not a diagnosis)</b>
+          {top.map(([k, v]) => (
+            <div className="row" key={k}><span>{k}</span><div className="bar"><i style={{ width: (v * 100) + "%" }} /></div><span>{(v * 100).toFixed(0)}%</span></div>
+          ))}
+          <hr style={{ borderColor: "#263445" }} />
+          <b>Radiologist decision</b>
+          <input placeholder="Reviewer name (required)" value={reviewer} onChange={e => setReviewer(e.target.value)} style={{ margin: "8px 0" }} />
+          <textarea rows="2" placeholder="Comment (optional)" value={comment} onChange={e => setComment(e.target.value)} />
+          <div className="btns">
+            <button className="btn ok" onClick={() => decide("approve")}>Approve AI result</button>
+            <button className="btn bad" onClick={() => decide("reject")}>Reject AI result</button>
+          </div>
+          {msg && <div className="msg">{msg}</div>}
+        </div>)}
+      </div>
+    </div>
+  );
+}
+
+function Audit() {
+  const [data, setData] = useState(null);
+  useEffect(() => { api("/audit").then(setData); }, []);
+  if (!data) return <div className="panel muted">Loading...</div>;
+  return (
+    <div className="panel">
+      <b>Audit log</b> <span className="muted">- append-only, hash-chained. Chain integrity: </span>
+      <b style={{ color: data.chain_valid ? "#56d364" : "#ff7b72" }}>{data.chain_valid ? "VALID" : "BROKEN"}</b>
+      <table style={{ marginTop: 10 }}>
+        <thead><tr><th>Time (UTC)</th><th>Study</th><th>Action</th><th>By</th><th>AI finding</th><th>Comment</th></tr></thead>
+        <tbody>{data.entries.map(e => (
+          <tr key={e.id}><td>{e.ts}</td><td>{e.study_id}</td><td>{e.action}</td><td>{e.actor}</td>
+              <td>{e.top_label} {e.confidence != null ? (e.confidence * 100).toFixed(0) + "%" : ""}</td><td>{e.comment}</td></tr>
+        ))}</tbody>
+      </table>
+    </div>
+  );
+}
+
+function Segmentation() {
+  const [d, setD] = useState(null);
+  useEffect(() => { api("/segmentation").then(setD); }, []);
+  if (!d) return <div className="panel muted">Loading...</div>;
+  const m = d.metrics;
+  return (
+    <div className="panel">
+      <b>3-D U-Net (MONAI) - hippocampus MRI segmentation (held-out cases)</b>
+      {m ? <p className="muted">Test Dice - anterior {m.test_dice_per_class.anterior.toFixed(3)}, posterior {m.test_dice_per_class.posterior.toFixed(3)}, mean {m.test_dice_mean.toFixed(3)} ({m.n_test} test volumes)</p>
+         : <p className="muted">No segmentation results found. Run the training pipeline first.</p>}
+      {d.images.map(n => <img key={n} src={"/api/segmentation/" + n} style={{ width: "100%", maxWidth: 760, display: "block", marginBottom: 12, borderRadius: 8 }} />)}
+    </div>
+  );
+}
+
+function About() {
+  const [d, setD] = useState(null);
+  useEffect(() => { api("/model").then(setD); }, []);
+  const m = d && d.metrics;
+  return (
+    <div className="panel">
+      <b>About this system - limits and bias</b>
+      <ul>
+        <li><b>For education only. Not a medical device. Never use for real clinical decisions.</b></li>
+        <li>Trained on down-sampled (128 px) NIH ChestX-ray14 images; labels were text-mined from reports and are noisy.</li>
+        <li>Single-source data: no external validation; performance on other hospitals, scanners, ages or populations is unknown and likely worse.</li>
+        <li>Probabilities are not calibrated. Grad-CAM shows where the model looked, not proof that it reasons correctly.</li>
+        <li>Every radiologist decision is recorded in the audit log together with the AI output they saw.</li>
+      </ul>
+      {m && <p className="muted">Model {m.version}: test mean AUROC {m.test_mean_auroc.toFixed(3)} over 14 findings ({m.n_test} test images).</p>}
+    </div>
+  );
+}
+
+function App() {
+  const [tab, setTab] = useState("review");
+  const tabs = [["review", "Review"], ["audit", "Audit log"], ["seg", "Segmentation"], ["about", "About / limits"]];
+  return (
+    <div>
+      <div className="banner">FOR EDUCATION ONLY - NOT FOR CLINICAL USE</div>
+      <header><h1>AI-Assisted Medical Imaging Review</h1>
+        <nav>{tabs.map(([k, l]) => <button key={k} className={tab === k ? "on" : ""} onClick={() => setTab(k)}>{l}</button>)}</nav></header>
+      <main>
+        {tab === "review" && <Review />}
+        {tab === "audit" && <Audit />}
+        {tab === "seg" && <Segmentation />}
+        {tab === "about" && <About />}
+      </main>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+file,reference_label
+demo_00.dcm,infiltration
+demo_01.dcm,"infiltration, nodule"
+demo_02.dcm,"infiltration, pneumothorax"
+demo_03.dcm,pneumothorax
+demo_04.dcm,mass
+demo_05.dcm,"atelectasis, effusion, mass"
+demo_06.dcm,"infiltration, pneumonia"
+demo_07.dcm,effusion
+demo_08.dcm,no finding
+demo_09.dcm,no finding
+demo_10.dcm,no finding
+demo_11.dcm,no finding

@@ -1,0 +1,17 @@
+data:
+  image_size: 128      # ChestMNIST (NIH ChestX-ray14, down-sampled) resolution
+  max_train: 20000
+  max_val: 4000
+  max_test: 10000
+  seed: 42
+classifier:
+  epochs: 4
+  batch_size: 128
+  lr: 0.0003
+segmentation:
+  epochs: 60
+  batch_size: 4
+  lr: 0.001
+  spatial_size: [48, 64, 48]
+examples:
+  n_dicom: 12

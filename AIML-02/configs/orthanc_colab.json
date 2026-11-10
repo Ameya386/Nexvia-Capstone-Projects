@@ -1,0 +1,10 @@
+{
+  "Name": "AIML02-Orthanc",
+  "StorageDirectory": "/content/orthanc-db",
+  "IndexDirectory": "/content/orthanc-db",
+  "RemoteAccessAllowed": true,
+  "AuthenticationEnabled": false,
+  "DicomAet": "ORTHANC",
+  "DicomPort": 4242,
+  "HttpPort": 8042
+}
